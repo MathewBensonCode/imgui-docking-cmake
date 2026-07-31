@@ -1,9 +1,9 @@
-cmake_minimum_required(VERSION 4.0)
+cmake_minimum_required(VERSION 3.25...4.4)
 
 project(imgui CXX)
 
 add_library(imgui)
-add_library(imgui::Imgui ALIAS imgui)
+add_library(imgui::imgui ALIAS imgui)
 
 target_sources(
   imgui
@@ -29,23 +29,25 @@ target_sources(
          backends/imgui_impl_glfw.h
          )
 
-         find_package(VulkanHeaders CONFIG REQUIRED)
-         find_package(VulkanLoader CONFIG REQUIRED)
-         find_package(glfw3 CONFIG REQUIRED)
+         if(PROJECT_IS_TOP_LEVEL)
+             find_package(VulkanHeaders CONFIG REQUIRED)
+             find_package(VulkanLoader CONFIG REQUIRED)
+             find_package(glfw3 CONFIG REQUIRED)
+         endif()
 
          target_link_libraries(imgui PRIVATE Vulkan::Headers Vulkan::Loader glfw)
 
-         set_target_properties(imgui PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
+         set_target_properties(imgui PROPERTIES INSTALL_RPATH lib)
 
 install(
   TARGETS imgui
   EXPORT imgui-exports
   FILE_SET HEADERS
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/include/imgui)
+  DESTINATION include/imgui)
 install(
   EXPORT imgui-exports
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/imgui
+  DESTINATION lib/cmake/imgui
   NAMESPACE imgui::
   FILE imgui-targets.cmake)
 install(
-    FILES ${CMAKE_CURRENT_SOURCE_DIR}/imguiConfig.cmake DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/imgui)
+    FILES ${CMAKE_CURRENT_SOURCE_DIR}/imguiConfig.cmake DESTINATION lib/cmake/imgui)
